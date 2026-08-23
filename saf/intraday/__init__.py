@@ -1,0 +1,1 @@
+"""Intraday desk — computed lead-lag scanner (improvements.txt PART 12)."""

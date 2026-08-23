@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skia Alpha Fund v4.2 — Terminal</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="terminal.css">
+</head>
+<body>
+<header>
+  <div class="brand" id="brand">
+    <img src="logo.png" class="emblem" alt="SAF"
+         onerror="this.outerHTML='<div class=&quot;emblem&quot;>α</div>'">
+    <div>
+      <div class="saf">SAF</div>
+      <div class="full">SKIA ALPHA FUND v4.2</div>
+    </div>
+  </div>
+  <nav id="nav">
+    <button data-tab="dash" class="on">Dashboard</button>
+    <button data-tab="news">News</button>
+    <button data-tab="screener">Screener</button>
+    <button data-tab="agents">TradingAgents</button>
+    <button data-tab="positions">Positions</button>
+    <button data-tab="memory">Memory</button>
+    <button data-tab="diag">Diagnostics</button>
+  </nav>
+  <div id="modeToggle"></div>
+</header>
+
+<main id="main"></main>
+
+<div id="mbg">
+  <div class="modal">
+    <button class="btn ghost x" data-close>✕</button>
+    <h2 id="mtitle"></h2>
+    <div id="mbody"></div>
+  </div>
+</div>
+
+<footer>
+  SKIA ALPHA FUND v4.2 · SHADOW ALPHA TERMINAL · α = EXCESS RETURN · CLICK ANYTHING TO DRILL DOWN
+</footer>
+
+<script src="client.js"></script>
+</body>
+</html>

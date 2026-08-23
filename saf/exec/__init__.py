@@ -1,0 +1,1 @@
+"""Execution layer — capacity, slippage, sizing, lifecycle (improvements.txt PART 7-8)."""

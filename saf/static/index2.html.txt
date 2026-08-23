@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Skia Alpha Fund — Terminal</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ivory:#f4eee1;--paper:#fbf7ec;--navy:#0d1f33;--navy2:#13293f;--ink:#1a2b40;--gold:#c9a13b;--gold2:#a5762a;--goldL:#e9cf9a;--line:rgba(13,31,51,.14);--pos:#1d7a4f;--neg:#a33535;--hold:#b07d2a}
+*{box-sizing:border-box;margin:0;padding:0}body{background:var(--ivory);color:var(--ink);font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:1.5}
+h1,h2,h3,.serif{font-family:'Playfair Display',Georgia,serif;color:var(--navy)}
+a.nl{color:var(--navy);text-decoration:none;font-weight:600}a.nl:hover{color:var(--gold2);text-decoration:underline}
+header{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,var(--navy) 0%,var(--navy2) 100%);border-bottom:3px solid var(--gold);padding:10px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;box-shadow:0 4px 18px rgba(13,31,51,.35)}
+.brand{display:flex;align-items:center;gap:12px;cursor:pointer}.brand .saf{font-family:'Playfair Display',serif;font-weight:800;font-size:24px;color:var(--ivory);letter-spacing:2px;line-height:1}.brand .full{font-size:9.5px;letter-spacing:4px;color:var(--goldL);font-weight:600}
+nav{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}nav button{background:transparent;border:1px solid transparent;color:var(--ivory);font:600 12px Inter;letter-spacing:1.5px;padding:8px 14px;cursor:pointer;border-radius:8px;text-transform:uppercase;transition:.2s}nav button:hover{border-color:var(--gold);color:var(--goldL)}nav button.on{background:var(--gold);color:var(--navy);box-shadow:0 2px 8px rgba(201,161,59,.4)}
+.pills{display:flex;gap:6px}.pill{font:600 10px Inter;letter-spacing:1px;padding:5px 10px;border-radius:20px;border:1px solid}.pill.ok{color:#9fe0bd;border-color:#2c6e4f;background:rgba(29,122,79,.25)}.pill.off{color:#e8c9a0;border-color:#8a6a3a;background:rgba(176,125,42,.18)}
+main{max-width:1280px;margin:0 auto;padding:24px 18px 60px}.wrap{display:flex;flex-direction:column;gap:18px;animation:up .35s ease}@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:0 2px 10px rgba(13,31,51,.06)}.card h1{font-size:24px;margin-bottom:2px}.card h2{font-size:17px;padding-bottom:8px;margin-bottom:12px;border-bottom:2px solid transparent;border-image:linear-gradient(90deg,var(--gold),transparent) 1}
+.sub{color:#6b7787;font-size:12px;margin-bottom:12px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input,select{font:500 13px Inter;padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);outline:none}input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,161,59,.18)}
+.btn{background:var(--navy);color:var(--ivory);border:none;border-radius:9px;padding:10px 16px;font:600 12.5px Inter;letter-spacing:.6px;cursor:pointer;transition:.2s}.btn:hover{background:var(--navy2);box-shadow:0 0 0 3px rgba(201,161,59,.3)}.btn.gold{background:linear-gradient(135deg,var(--gold2),var(--gold) 45%,var(--goldL));color:var(--navy)}.btn.ghost{background:transparent;color:var(--navy);border:1px solid var(--navy)}.btn:disabled{opacity:.5;cursor:wait}
+.grid2{display:grid;grid-template-columns:2fr 1fr;gap:18px}.grid-tools{display:grid;grid-template-columns:250px 1fr;gap:18px}@media(max-width:960px){.grid2,.grid-tools{grid-template-columns:1fr}}
+.tools{display:flex;flex-direction:column;gap:6px}.tools button{text-align:left;background:#fff;border:1px solid var(--line);border-radius:10px;padding:11px 14px;font:600 12.5px Inter;color:var(--ink);cursor:pointer;transition:.15s}.tools button:hover{border-color:var(--gold);background:#fffdf6}.tools button.on{background:var(--navy);color:var(--ivory);border-color:var(--navy)}
+.tbl{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:12.5px}th{font:700 10.5px Inter;letter-spacing:1.4px;text-transform:uppercase;color:var(--navy);text-align:left;padding:8px 10px;border-bottom:2px solid var(--gold)}td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}tr:hover td{background:rgba(201,161,59,.07)}td.r,th.r{text-align:right}td.c,th.c{text-align:center}
+.dim{color:#9aa5b1}.pos{color:var(--pos);font-weight:600}.neg{color:var(--neg);font-weight:600}.secrow td{background:rgba(13,31,51,.05);font-weight:700;color:var(--gold2);letter-spacing:1px}
+.sig{font:700 10px Inter;letter-spacing:.8px;padding:4px 9px;border-radius:14px;white-space:nowrap}.sig.buy,.sig.pass,.sig.candidate{color:#fff;background:var(--pos)}.sig.sell,.sig.fail{color:#fff;background:var(--neg)}.sig.hold,.sig.watch{color:#fff;background:var(--hold)}.sig.none{color:#8a94a2;background:#e8e4d8}
+.panel{border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:10px;background:#fff;padding:14px 16px;margin:10px 0}.panel.buy{border-left-color:var(--pos)}.panel.sell{border-left-color:var(--neg)}.panel.hold{border-left-color:var(--hold)}.panel h3{font-size:14px;margin-bottom:6px}
+pre.memo{white-space:pre-wrap;font:12.5px/1.6 Inter;color:var(--ink)}.stage{display:flex;gap:14px;position:relative;padding-bottom:18px}.stage::before{content:"";position:absolute;left:17px;top:36px;bottom:0;width:2px;background:linear-gradient(var(--gold),rgba(201,161,59,.15))}.stage:last-child::before{display:none}.stage .n{width:36px;height:36px;flex:none;border-radius:50%;background:var(--navy);color:var(--goldL);font:700 14px 'Playfair Display';display:flex;align-items:center;justify-content:center;border:2px solid var(--gold)}.stage .b{flex:1;min-width:0}.stage h3{font-size:14px}.stage .txt{font-size:12.5px;color:#415062;max-height:220px;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-top:6px;white-space:pre-wrap}
+.loader{display:inline-block;width:14px;height:14px;border:2px solid var(--gold);border-top-color:transparent;border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px}@keyframes sp{to{transform:rotate(360deg)}}
+.chip{display:inline-block;background:#fff;border:1px solid var(--line);border-radius:14px;padding:3px 10px;margin:2px;font:600 11px Inter;color:var(--navy)}.kv{display:grid;grid-template-columns:170px 1fr;gap:6px 14px;font-size:12.5px}.kv b{color:var(--navy)}
+.bar{height:8px;border-radius:5px;background:#e8e2d2;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold2),var(--goldL))}
+.prov{font:600 9px Inter;letter-spacing:1px;padding:2px 6px;border-radius:4px;margin-left:6px}.prov.live{background:rgba(29,122,79,.15);color:var(--pos)}.prov.cached{background:rgba(201,161,59,.15);color:var(--gold2)}.prov.est{background:rgba(176,125,42,.15);color:var(--hold)}
+#mbg{display:none;position:fixed;inset:0;background:rgba(13,31,51,.55);backdrop-filter:blur(3px);z-index:100;align-items:flex-start;justify-content:center;padding:4vh 16px;overflow:auto}.modal{background:var(--paper);border-radius:16px;border-top:5px solid var(--gold);max-width:900px;width:100%;padding:22px 26px;position:relative;animation:up .25s;box-shadow:0 20px 60px rgba(0,0,0,.4)}.modal .x{position:absolute;top:12px;right:12px}
+footer{text-align:center;padding:26px;color:#8a94a2;font-size:11px;letter-spacing:2px}
+</style>
+</head>
+<body>
+<script>
+/* PATCH: error tripwire — any JS failure becomes a visible red banner, never silent */
+window.__err=[];
+window.addEventListener("error",function(e){window.__err.push((e.message||"error")+" @"+e.lineno);
+var b=document.getElementById("__errbanner");
+if(!b){b=document.createElement("div");b.id="__errbanner";
+b.style.cssText="position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#a33535;color:#fff;font:600 12px monospace;padding:8px 12px";
+(document.body||document.documentElement).appendChild(b);}
+b.textContent="⚠️ "+window.__err.slice(-3).join(" | ");});
+</script>
+<header>
+  <div class="brand" id="brand"><div><div class="saf">SAF</div><div class="full">SKIA ALPHA FUND</div></div></div>
+  <nav id="nav">
+    <button data-tab="dash" class="on">Dashboard</button>
+    <button data-tab="news">News</button>
+    <button data-tab="screener">Screener</button>
+    <button data-tab="agents">TradingAgents</button>
+    <button data-tab="positions">Positions</button>
+    <button data-tab="memory">Memory</button>
+    <button data-tab="diag">Diagnostics</button>
+  </nav>
+  <div class="pills"><span class="pill ok" id="pillAI">NOUS</span><span class="pill ok" id="pillData">v4.1</span></div>
+</header>
+<main id="main"></main>
+<div id="mbg"><div class="modal"><button class="btn ghost x" data-close>✕</button><h2 id="mtitle"></h2><div id="mbody"></div></div></div>
+<footer>SKIA ALPHA FUND · SHADOW ALPHA TERMINAL · POWERED BY NOUS OX ALPHA</footer>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+function fmtPct(v){if(v==null||isNaN(v))return'<span class="dim">—</span>';return v>=0?`<span class="pos">▲ +${v.toFixed(2)}%</span>`:`<span class="neg">▼ ${v.toFixed(2)}%</span>`;}
+function fmtMC(mc){if(mc==null)return"—";if(mc>=1e12)return"$"+(mc/1e12).toFixed(2)+"T";if(mc>=9e8)return"$"+(mc/1e9).toFixed(2)+"B";if(mc>=1e6)return"$"+(mc/1e6).toFixed(1)+"M";return"$"+Math.round(mc).toLocaleString();}
+function num(v,d){return(v==null||isNaN(v))?(d??"—"):Number(v);}
+/* PATCH: toast for long-running AI jobs */
+function toast(msg){let w=document.getElementById("toasts");if(!w){w=document.createElement("div");w.id="toasts";
+w.style.cssText="position:fixed;bottom:16px;right:16px;z-index:300;display:flex;flex-direction:column;gap:6px";document.body.appendChild(w);}
+const t=document.createElement("div");t.style.cssText="background:#0d1f33;color:#f4eee1;border-left:4px solid #c9a13b;border-radius:8px;padding:9px 13px;font:500 12.5px Inter;max-width:320px";t.textContent=msg;
+w.appendChild(t);setTimeout(()=>t.remove(),5000);}
+
+/* PATCH: hardened api() — timeouts, friendly offline message, 429 handling, optional remote base */
+const API_BASE=(new URLSearchParams(location.search).get("api")||localStorage.getItem("saf_api_base")||"").replace(/\/+$/,"");
+function setApiBase(u){u?(localStorage.setItem("saf_api_base",u.replace(/\/+$/,"")),location.reload()):(localStorage.removeItem("saf_api_base"),location.reload());}
+async function api(path,opts={},timeoutMs=20000){
+  const explicitTimeout=typeof opts.timeout==="number"?opts.timeout:(typeof timeoutMs==="number"?timeoutMs:20000);
+  const ctrl=new AbortController();const tm=setTimeout(()=>ctrl.abort(),explicitTimeout);let r;
+  const url=API_BASE+path;
+  try{r=await fetch(url,Object.assign({},opts,{signal:ctrl.signal}));}
+  catch(e){clearTimeout(tm);console.error("SAF api() fetch failed for",url,"→",e);
+    throw new Error("fetch("+url+") "+ (e.name==="AbortError"?"timed out":(e.message||e)));}
+  clearTimeout(tm);
+  if(r.status===429){throw new Error("rate limited — wait ~30s");}
+  if(!r.ok){let d="";try{d=(await r.json()).detail||"";}catch(e){}
+    throw new Error(path.split("?")[0]+" → HTTP "+r.status+(d?" · "+d:""));}
+  return r.json();}
+
+function tvSymbol(t){const S={".DE":"XETRA:",".ST":"STO:",".AS":"AMS:",".PA":"EPA:",".L":"LSE:",".OL":"OSE:",".VI":"VIE:",".SW":"SWX:",".T":"TSE:"};for(const s in S)if(t.endsWith(s))return S[s]+t.slice(0,-s.length);if(/^[A-Z]{4,5}Y$/.test(t))return"OTC:"+t;return t;}
+
+/* PATCH: native candlestick renderer — server OHLC via /api/ticker/{t}/chart */
+function candlesSVG(cs,w,h){w=w||820;h=h||260;if(!cs||cs.length<2)return"<span class='dim'>no candles</span>";
+const hi=Math.max(...cs.map(c=>c.high??c.close)),lo=Math.min(...cs.map(c=>c.low??c.close)),rg=(hi-lo)||1;
+const X=i=>i/(cs.length-1)*(w-46)+34,Y=v=>h-18-(v-lo)/rg*(h-34);let s="";
+cs.forEach((c,i)=>{const x=X(i),col=(c.close>=(c.open??c.close))?"#1d7a4f":"#a33535";
+s+=`<line x1='${x.toFixed(1)}' y1='${Y(c.high??c.close).toFixed(1)}' x2='${x.toFixed(1)}' y2='${Y(c.low??c.close).toFixed(1)}' stroke='${col}'/>`+
+`<rect x='${(x-2.4).toFixed(1)}' y='${Math.min(Y(c.open??c.close),Y(c.close)).toFixed(1)}' width='4.8' height='${Math.max(1,Math.abs(Y(c.close)-Y(c.open??c.close))).toFixed(1)}' fill='${col}'/>`;});
+return `<svg width='100%' viewBox='0 0 ${w} ${h}' style='background:#fff;border:1px solid var(--line);border-radius:10px'>`+
+`<text x='2' y='12' font-size='10' fill='#6b7787'>$${hi.toFixed(0)}</text><text x='2' y='${h-4}' font-size='10' fill='#6b7787'>$${lo.toFixed(0)}</text>${s}</svg>`;}
+function loadCandles(t,elId,bars){api(`/api/ticker/${encodeURIComponent(t)}/chart?bars=${bars||180}`).then(d=>{
+const el=document.getElementById(elId);if(el)el.innerHTML=candlesSVG(d.candles);
+}).catch(()=>{const el=document.getElementById(elId);if(el)el.innerHTML=`<span class="dim">candles unavailable — <a class="nl" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvSymbol(t))}">open TradingView ↗</a></span>`;});}
+
+function openModal(title,html){$("#mtitle").innerHTML=title;$("#mbody").innerHTML=html;$("#mbg").style.display="flex";window.scrollTo(0,0);}
+function closeModal(){$("#mbg").style.display="none";}
+const state={tab:"dash"};
+$("#nav").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;state.tab=b.dataset.tab;document.querySelectorAll("#nav button").forEach(x=>x.classList.toggle("on",x===b));render();});
+function render(){({dash:renderDash,news:renderNews,screener:renderScreener,agents:renderAgents,positions:renderPositions,memory:renderMemory,diag:renderDiag})[state.tab]();}
+
+document.addEventListener("click",e=>{
+  if(e.target.closest("[data-close]")||e.target.id==="mbg"){closeModal();return;}
+  const tk=e.target.closest("[data-ticker]");if(tk){openTicker(tk.dataset.ticker);return;}
+  const bk=e.target.closest("[data-basket]");if(bk){openBasket(bk.dataset.basket);return;}
+});
+
+async function openBasket(name){
+  openModal("🧺 "+name,`<div class="sub"><span class="loader"></span> opening basket…</div>`);
+  try{
+    const d=await api("/api/basket/"+encodeURIComponent(name));
+    let rows="";for(const h of d.holdings){rows+=`<tr class="clickable" data-ticker="${h.ticker}"><td><b>${h.ticker}</b></td><td class="r">${h.weight.toFixed(1)}</td><td class="r">${h.price!=null?"$"+h.price.toFixed(2):"—"}</td><td class="r">${fmtPct(h.ytd_pct)}</td></tr>`;}
+    $("#mbody").innerHTML=`<div class="tbl"><table><tr><th>Ticker (click for dossier)</th><th class="r">Weight</th><th class="r">Price</th><th class="r">YTD</th></tr>${rows}</table></div>`;
+  }catch(e){$("#mbody").innerHTML=`<div class="panel sell">Error: ${e.message}</div>`;}
+}
+
+async function openTicker(t){
+  openModal("🔍 "+t+" — Dossier",`<div class="sub"><span class="loader"></span> compiling dossier via Ox Alpha…</div>`);
+  try{
+    const [d,rub]=await Promise.all([api("/api/ticker/"+encodeURIComponent(t)),api("/api/ticker/"+encodeURIComponent(t)+"/rubric").catch(()=>({ok:false}))]);
+    const sc=d.score_v2_core;const f=d.fundamentals||{};const q=d.quality||{};
+    /* PATCH: defensive score rendering — generic component loop (handles negatives), verdict chip */
+    $("#mbody").innerHTML=`<div class="row" style="margin-bottom:10px"><span class="chip">$${num(d.price)}</span><span class="chip">Shadow Alpha <b>${sc?num(sc.total):"—"}/100</b></span>${sc&&sc.verdict?`<span class="chip">${sc.verdict}</span>`:""}<span class="prov ${d.provenance.source}">${d.provenance.source}</span></div>
+    <div class="panel" style="margin:10px 0"><h3>📈 Price Action (server candles)</h3><div id="mchart"><span class="loader"></span></div></div>
+    <div class="grid2" style="gap:12px">
+      <div class="panel"><h3>Technicals</h3><div class="kv"><b>Bars</b><span>${q.bars||0}</span><b>Usable</b><span>${q.usable?"✅":"❌"}</span><b>Flags</b><span>${(Array.isArray(q.flags)?q.flags:[]).join(", ")||"none"}</span></div></div>
+      <div class="panel"><h3>Fundamentals</h3><div class="kv"><b>Sector</b><span>${f.sector||"—"}</span><b>Market cap</b><span>${fmtMC(f.marketCap)}</span><b>Gross margin</b><span>${f.grossMargins?(f.grossMargins*100).toFixed(1)+"%":"—"}</span></div></div>
+    </div>
+    ${sc?`<div class="panel"><h3>Score v2</h3><div class="kv">${Object.entries(sc.components||{}).map(([k,v])=>`<b>${k.replace(/_/g," ")}</b><span style="color:${v>=8?"var(--pos)":v>=3?"inherit":"var(--neg)"}">${num(v).toFixed(1)}</span>`).join("")}</div><div class="sub" style="margin:4px 0 0">α-Indep & RelStr can be negative by design.</div></div>`:""}
+    ${rub.ok&&rub.rubric?`<div class="panel"><h3>Grounded Rubric · ${rub.rubric.total}/30 ${rub.cached?'<span class="prov cached">cached</span>':'<span class="prov live">fresh</span>'}</h3><div class="kv">${Object.entries(rub.rubric.scores||{}).map(([k,v])=>`<b>${k.replace(/_/g," ")}</b><span>${v}/5</span>`).join("")}</div></div>`:""}
+    <div class="panel"><h3>📰 News Wire</h3><div id="mnews"><span class="loader"></span></div></div>
+    <div class="row"><button class="btn gold" id="mrun">▶ Run 5-Stage Pipeline</button></div><div id="mpipe"></div>`;
+    loadCandles(t,"mchart",180);
+    api("/api/news?q="+encodeURIComponent(t)).then(hs=>{const el=$("#mnews");if(el)el.innerHTML=hs.items.length?hs.items.map(h=>`<div style="margin:5px 0">${h.link?`<a class="nl" href="${h.link}" target="_blank" rel="noopener">${h.title} ↗</a>`:`<b>${h.title}</b>`} <span class="dim">— ${h.source}</span></div>`).join(""):"<span class='dim'>No headlines.</span>";}).catch(()=>{const el=$("#mnews");if(el)el.innerHTML="<span class='dim'>news unavailable</span>";});
+    $("#mrun").onclick=async()=>{
+      $("#mrun").disabled=true;const startTime=Date.now();
+      $("#mpipe").innerHTML=`<div class="panel"><span class="loader"></span> Running pipeline via Ox Alpha… <span id="elapsed">0s</span> elapsed.</div>`;
+      const timer=setInterval(()=>{const el=document.getElementById("elapsed");if(el)el.textContent=Math.floor((Date.now()-startTime)/1000)+"s";},1000);
+      try{
+        const res=await api("/api/pipeline/"+encodeURIComponent(t),{method:"POST"},180000);clearInterval(timer);
+        renderPipelineStages("mpipe",res.state);const a=res.state.trader.action;const col=a==="BUY"?"buy":a==="SELL"?"sell":"hold";
+        $("#mpipe").insertAdjacentHTML("beforeend",`<div class="panel ${col}"><h3 style="font-size:18px">FINAL SIGNAL: ${a}</h3><div class="sub">${res.state.trader.rationale||""}</div></div>`);
+        toast(`Pipeline done: ${t} → ${a}`);
+      }catch(e){clearInterval(timer);$("#mpipe").innerHTML=`<div class="panel sell">Pipeline error: ${e.message}</div>`;}
+      $("#mrun").disabled=false;
+    };
+  }catch(e){$("#mbody").innerHTML=`<div class="panel sell">Error: ${e.message}</div>`;}
+}
+
+/* PATCH: stage renderer — claim counts, ABSTAIN flag, honest stage IV */
+function renderPipelineStages(containerId,st){
+  const c=document.getElementById(containerId);if(!c)return;
+  const v=st.verdict||{};
+  const claims=v.bull_verified!=null?`\nClaims verified — BULL: ${v.bull_verified??0}✓/${v.bull_fabricated??0}✗ · BEAR: ${v.bear_verified??0}✓/${v.bear_fabricated??0}✗`:"";
+  const abstain=v.winner==="ABSTAIN"?`\n⚠️ ABSTAIN rule: low judge confidence forces HOLD.`:"";
+  const stages=[
+    {n:1,title:"I. ANALYST TEAM",txt:Object.entries(st.analysts||{}).map(([k,x])=>`— ${k.toUpperCase()} —\n${x}`).join("\n\n")},
+    {n:2,title:"II. BULL vs BEAR + JUDGE",txt:`[BULL]\n${st.bull||""}\n\n[BEAR]\n${st.bear||""}\n\nVERDICT: ${v.winner||"—"} (conf ${v.confidence??"—"})${claims}\n${v.rationale||""}${abstain}`},
+    {n:3,title:"III. TRADER",txt:JSON.stringify(st.trader||{},null,1)},
+    {n:4,title:"IV. MATH ENGINE",txt:st.trade?JSON.stringify({sizing:st.trade.sizing||st.trade,exits:st.trade.exits},null,1):((st.trader||{}).action==="BUY"?"No sizing object returned (sizing not wired into this run).":"HOLD — no position sized.")},
+    {n:5,title:"V. VERDICT",txt:`Direction: ${(st.trader||{}).action}\nPosition opened: ${st.position_opened?"YES — lifecycle monitor active":"no"}`}
+  ];
+  c.innerHTML=stages.map(s=>`<div class="card stage"><div class="n">${s.n}</div><div class="b"><h3>${s.title}</h3><div class="txt"><pre class="memo">${s.txt}</pre></div></div></div>`).join("");
+}
+
+async function renderDash(){
+  $("#main").innerHTML=`<div class="wrap"><div class="card"><h1>🦅 Skia Alpha Fund — Dashboard</h1><div class="sub" id="dsub">loading…</div>
+  <div class="row"><input id="q" placeholder="🔍 Search ticker…" style="width:220px"></div></div><div id="sres"></div>
+  <div class="grid2"><div class="card"><h2>📈 All Baskets Performance</h2><div class="tbl" id="dt"></div></div><div class="card"><h2>🏆 YTD Ranking</h2><div class="tbl" id="rt"></div></div></div></div>`;
+  try{
+    const d=await api("/api/baskets");$("#dsub").textContent=new Date().toLocaleString()+" · "+d.baskets.length+" baskets · Ox Alpha backend";
+    const bySection={};d.baskets.forEach(b=>{(bySection[b.section]=bySection[b.section]||[]).push(b);});
+    let html=`<table><tr><th>Basket</th><th class="r">1D</th><th class="r">1W</th><th class="r">1M</th><th class="r">YTD</th></tr>`;const perf=[];
+    for(const sec in bySection){html+=`<tr class="secrow"><td colspan="5">── ${sec} ──</td></tr>`;for(const b of bySection[sec]){html+=`<tr class="clickable" data-basket="${b.name}"><td>${b.name}</td><td class="r">${fmtPct(b.returns_pct["1d"])}</td><td class="r">${fmtPct(b.returns_pct["1w"])}</td><td class="r">${fmtPct(b.returns_pct["1m"])}</td><td class="r">${fmtPct(b.returns_pct.ytd)}</td></tr>`;if(b.returns_pct.ytd!=null)perf.push([b.name,b.returns_pct.ytd]);}}
+    $("#dt").innerHTML=html+"</table>";perf.sort((a,b)=>b[1]-a[1]);
+    $("#rt").innerHTML=`<table><tr><th class="c">#</th><th>Basket</th><th class="r">YTD</th></tr>`+perf.map((p,i)=>`<tr class="clickable" data-basket="${p[0]}"><td class="c" style="color:${i<5?"var(--pos)":i>=perf.length-3?"var(--neg)":"inherit"};font-weight:700">${i+1}</td><td>${p[0]}</td><td class="r">${fmtPct(p[1])}</td></tr>`).join("")+"</table>";
+    /* PATCH: debounced search — one request per pause, not per keystroke */
+    let _qt;$("#q").oninput=e=>{clearTimeout(_qt);_qt=setTimeout(async()=>{const q=e.target.value.toUpperCase().trim();const sr=$("#sres");
+    if(!q||!/^[A-Z0-9.\-]{1,8}$/.test(q)){sr.innerHTML="";return;}
+    sr.innerHTML='<div class="card"><span class="loader"></span></div>';
+    try{const td=await api("/api/ticker/"+encodeURIComponent(q));const s=td.score_v2_core;
+    sr.innerHTML=`<div class="card"><h2>✅ ${q}</h2><div class="kv"><b>Price</b><span>$${num(td.price)}</span><b>Score v2</b><span>${s?s.total+"/100 · "+(s.verdict||""):"insufficient history (<126 bars)"}</span></div><button class="btn gold" data-ticker="${q}" style="margin-top:10px">Open Dossier</button></div>`;
+    }catch(err){sr.innerHTML=`<div class="card">❌ ${q} — ${err.message}</div>`;}},350);};
+  }catch(e){$("#dt").innerHTML=`<div class="panel sell">Error: ${e.message}</div>`;}
+}
+
+async function renderNews(){
+  $("#main").innerHTML=`<div class="wrap"><div class="card"><h1>📰 Shadow Alpha News Wire</h1><div class="row"><input id="nq" value="NVDA" style="width:260px"><button class="btn gold" id="ngo">Load</button></div><div id="nwire" style="margin-top:14px"></div></div></div>`;
+  const load=async()=>{const q=$("#nq").value.trim();if(!q)return;$("#nwire").innerHTML='<div class="panel"><span class="loader"></span></div>';try{const hs=await api("/api/news?q="+encodeURIComponent(q));$("#nwire").innerHTML=hs.items.length?hs.items.map(h=>`<div class="panel">${h.link?`<a class="nl" href="${h.link}" target="_blank" rel="noopener">${h.title} ↗</a>`:`<b>${h.title}</b>`}<div class="dim">${h.source} · relevance ${h.relevance} ${(h.keywords||[]).map(k=>`<span class="chip">${k}</span>`).join("")}</div></div>`).join(""):`<div class="panel sell">No headlines.</div>`;}catch(e){$("#nwire").innerHTML=`<div class="panel sell">Error: ${e.message}</div>`;}};
+  $("#ngo").onclick=load;$("#nq").addEventListener("keydown",e=>{if(e.key==="Enter")load();});load();
+}
+
+function renderScreener(){
+  $("#main").innerHTML=`<div class="wrap"><div class="card"><h1>🔍 SAF Screener + AI</h1><div class="sub">9 tools · all routed through Ox Alpha · AI tools take 30–120s</div></div>
+  <div class="grid-tools"><div class="card tools">
+    <button data-t="screen" class="on">📡 Full Screen</button><button data-t="deep">🔍 Deep Analysis</button><button data-t="bot">🧮 Bottleneck Scoring</button>
+    <button data-t="uni">📋 Universe</button><button data-t="cmp">📊 Compare Top</button><button data-t="sup">🤖 AI Supply Chain</button>
+    <button data-t="abot">🤖 AI Bottleneck</button><button data-t="adeep">🤖 AI Deep Report</button><button data-t="pm">🎲 Polymarket</button>
+  </div><div class="card" id="out"><div class="dim">Select a tool…</div></div></div></div>`;
+  document.querySelectorAll(".tools button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tools button").forEach(x=>x.classList.toggle("on",x===b));SCREENER[b.dataset.t]();});SCREENER.screen();
+}
+
+const SCREENER={
+  async screen(){const out=$("#out");out.innerHTML=`<h2>📡 Full Universe Scan</h2><div class="sub" id="prog"><span class="loader"></span></div><div id="res"></div>`;try{const d=await api("/api/screen?top=50");const cand=d.top.filter(r=>r.total>=60).length;const watch=d.top.filter(r=>r.total>=45&&r.total<60).length;$("#prog").textContent=`🎯 ${cand} CANDIDATES · 👀 ${watch} WATCH · ${d.n_scored} scored`;let html=`<div class="tbl"><table><tr><th>#</th><th>Ticker</th><th class="r">Total</th><th class="r">Trend</th><th class="r">α-Indep</th><th class="r">Quality</th><th class="c">Verdict</th></tr>`;d.top.forEach((r,i)=>{const c=r.components||{};html+=`<tr class="clickable" data-ticker="${r.ticker}"><td>${i+1}</td><td><b>${r.ticker}</b></td><td class="r"><b>${num(r.total).toFixed(1)}</b></td><td class="r">${num(c.trend).toFixed(0)}</td><td class="r">${num(c.alpha_indep).toFixed(0)}</td><td class="r">${num(c.quality).toFixed(0)}</td><td class="c"><span class="sig ${String(r.verdict||"none").toLowerCase()}">${r.verdict||"—"}</span></td></tr>`;});$("#res").innerHTML=html+"</table></div>";}catch(e){$("#res").innerHTML=`<div class="panel sell">Error: ${e.message}</div>`;}},
+  /* PATCH: deep analysis — real checks breakdown + score + native candles (was bare iframe) */
+  async deep(){const out=$("#out");out.innerHTML=`<h2>🔍 Deep Analysis</h2><div class="row"><input id="tk" value="MKSI" style="width:110px"><button class="btn" id="go">Run</button></div><div id="dr"></div>`;
+    $("#go").onclick=async()=>{const t=$("#tk").value.toUpperCase().trim();$("#dr").innerHTML='<div class="panel"><span class="loader"></span></div>';
+    try{const d=await api("/api/screener/deep/"+encodeURIComponent(t));const inv=d.investability||{};const s=d.score_v2;
+    $("#dr").innerHTML=`<h3>Investability — <span class="sig ${inv.status==="PASS"?"pass":"watch"}">${inv.status||"—"}</span></h3>
+    <div class="panel"><div class="kv"><b>Market cap &gt;$500M</b><span>${fmtMC(inv.market_cap)} ${inv.checks&&inv.checks.market_cap_ok?"✅":"❌"}</span><b>Price &gt;$5</b><span>$${num(inv.price).toFixed(2)} ${inv.checks&&inv.checks.price_ok?"✅":"❌"}</span><b>Avg volume &gt;100K</b><span>${num(inv.avg_volume).toLocaleString()} ${inv.checks&&inv.checks.volume_ok?"✅":"❌"}</span><b>Score v2</b><span>${s?s.total+"/100 · "+(s.verdict||""):"—"}</span></div></div>
+    ${d.in_baskets&&d.in_baskets.length?`<div class="panel"><h3>In baskets</h3>${d.in_baskets.map(b=>`<span class="chip" data-basket="${b}">${b}</span>`).join("")}</div>`:""}
+    <h3>Candles (180d)</h3><div id="dc"><span class="loader"></span></div>
+    <button class="btn gold" data-ticker="${t}" style="margin-top:8px">Open Full Dossier</button>`;
+    loadCandles(t,"dc",180);}catch(e){$("#dr").innerHTML=`<div class="panel sell">Error: ${e.message}</div>`;}};},
+  async bot(){SCREENER.abot();},
+  async uni(){const out=$("#out");try{const d=await api("/api/screener/universe");let html=`<h2>🌍 Universe (${d.total_tickers} tickers)</h2>`;for(const s in d.universe){html+=`<div class="panel"><h3>${s} (${d.universe[s].length})</h3>`+d.universe[s].map(t=>`<span class="chip" data-ticker="${t}">${t}</span>`).join("")+`</div>`;}out.innerHTML=html;}catch(e){out.innerHTML=`<div class="panel sell">Error: ${e.message}</div>`;}},
+  cmp(){$("#out").innerHTML=`<h2>Compare</h2><div class="dim">Run Full Screen first, then click rows.</div>`;},
+  async sup(){const out=$("#out");out.innerHTML=`<h2>🤖 AI Supply Chain Map</h2><div class="row"><input id="tr" style="flex:1" value="solid-state batteries"><button class="btn gold" id="go">Map</button></div><div id="r" style="margin-top:10px"></div>`;
+    $("#go").onclick=async()=>{const trend=$("#tr").value.trim();if(!trend)return;$("#r").innerHTML='<div class="panel"><span class="loader"></span> Ox Alpha mapping (30-90s)…</div>';
+    try{const d=await api("/api/screener/supply-chain",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({trend})},{timeout:150000});
+    const res=d.result;let html=`<div class="panel buy"><h3>🎯 ${res.top_pick||"—"}</h3><div class="sub">${res.thesis_summary||""}</div></div>`;(res.bottlenecks||[]).forEach((b,i)=>{html+=`<div class="panel"><h3>#${i+1} ${b.name||"?"}</h3><div class="sub">${b.why_bottleneck||""}</div><div>Tickers: ${(b.tickers||[]).map(t=>`<span class="chip" data-ticker="${t}">${t}</span>`).join("")}</div></div>`;});
+    $("#r").innerHTML=html;toast("Supply-chain map ready");}catch(e){$("#r").innerHTML=`<div class="panel sell">Error: ${e.message}</div>`;}};},
+  async abot(){const out=$("#out");out.innerHTML=`<h2>🧮 Bottleneck Scoring</h2><div class="row"><input id="tk" value="MKSI" style="width:110px"><button class="btn" id="go">Score</button></div><div id="ai"></div>`;
+    $("#go").onclick=async()=>{const t=$("#tk").value.toUpperCase().trim();$("#ai").innerHTML='<div class="panel"><span class="loader"></span></div>';
+    try{const r=await api("/api/screener/bottleneck-ai/"+encodeURIComponent(t),{method:"POST"},120000);const res=r.rubric;let html=`<table><tr><th>Criterion</th><th class="c">Score</th></tr>`;Object.entries(res.scores||{}).forEach(([k,v])=>{html+=`<tr><td>${k.replace(/_/g," ")}</td><td class="c" style="color:${v>=4?"var(--pos)":v>=3?"var(--hold)":"var(--neg)"};font-weight:700">${v}/5</td></tr>`;});html+=`<tr><td><b>TOTAL</b></td><td class="c"><b>${res.total}/30 ${res.total>=22?"🏆":""}</b></td></tr></table>`;$("#ai").innerHTML=html;toast("Rubric scored: "+t);}catch(e){$("#ai").innerHTML=`<div class="panel sell">Error: ${e.message}</div>`;}};},
+  async adeep(){const out=$("#out");out.innerHTML=`<h2>🤖 AI Deep Report</h2><div class="row"><input id="tk" value="MKSI" style="width:110px"><button class="btn gold" id="go">Generate</button></div><div id="r"></div>`;
+    $("#go").onclick=async()=>{const t=$("#tk").value.toUpperCase().trim();$("#r").innerHTML=`<div class="panel"><span class="loader"></span> writing memo (60-120s)…</div>`;
+    try{const d=await api("/api/screener/deep-report/"+encodeURIComponent(t),{},{timeout:240000});const col=d.action==="BUY"?"buy":d.action==="SELL"?"sell":"hold";
+    $("#r").innerHTML=`<div class="panel ${col}"><h3>FINAL: ${d.action}${d.confidence!=null?" · conf "+d.confidence:""}</h3><pre class="memo">${d.memo}</pre></div>`;toast("Deep report ready: "+t);}catch(e){$("#r").innerHTML=`<div class="panel sell">Error: ${e.message}</div>`;}};},
+  async pm(){const out=$("#out");out.innerHTML=`<h2>🎲 Polymarket</h2><div class="row"><input id="pmq" value="fed rate cut" style="width:220px"><button class="btn" id="pmgo">Search</button></div><div id="pmr" style="margin-top:10px"></div>`;
+    const load=async q=>{$("#pmr").innerHTML='<div class="panel"><span class="loader"></span></div>';try{const d=await api("/api/polymarket?q="+encodeURIComponent(q||"fed rate cut")+"&limit=10");$("#pmr").innerHTML=d.items.length?d.items.map(m=>`<div class="panel"><b>${m.question}</b><div class="bar" style="margin:6px 0"><i style="width:${Math.round((m.yes??0.5)*100)}%"></i></div><div class="sub">YES ${m.yes!=null?Math.round(m.yes*100)+"%":"—"}</div></div>`).join(""):`<div class="panel sell">No markets.</div>`;}catch(e){$("#pmr").innerHTML=`<div class="panel sell">Error: ${e.message}</div>`;}};
+    $("#pmgo").onclick=()=>load($("#pmq").value.trim());load(null);}
+};
+
+async function renderAgents(){
+  $("#main").innerHTML=`<div class="wrap"><div class="card"><h1>⚛️ TradingAgents</h1><div class="sub">Real data · Ox Alpha · math sizing</div>
+  <div class="row"><input id="tk" value="MP" style="width:110px"><button class="btn gold" id="go">▶ Run Pipeline</button></div></div><div id="tl"></div></div>`;
+  $("#go").onclick=async()=>{
+    const t=$("#tk").value.toUpperCase().trim();const startTime=Date.now();
+    $("#tl").innerHTML=`<div class="panel"><span class="loader"></span> Ox Alpha running… <span id="elapsed">0s</span></div>`;
+    const timer=setInterval(()=>{const el=document.getElementById("elapsed");if(el)el.textContent=Math.floor((Date.now()-startTime)/1000)+"s";},1000);
+    try{
+      const res=await api("/api/pipeline/"+encodeURIComponent(t),{method:"POST"},180000);clearInterval(timer);$("#tl").innerHTML="";
+      renderPipelineStages("tl",res.state);const a=res.state.trader.action;const col=a==="BUY"?"buy":a==="SELL"?"sell":"hold";
+      $("#tl").insertAdjacentHTML("beforeend",`<div class="panel ${col}"><h3>FINAL: ${a}</h3></div>`);
+      toast(`Pipeline done: ${t} → ${a}`);
+    }catch(e){clearInterval(timer);$("#tl").innerHTML=`<div class="panel sell">Error: ${e.message}</div>`;}
+  };
+}
+
+/* PATCH: NEW TAB — live positions from /api/positions (route existed, UI never used it) */
+async function renderPositions(){
+  $("#main").innerHTML=`<div class="wrap"><div class="card"><h1>💼 Open Positions — Lifecycle Monitor</h1><div class="sub">direction-aware stops · trailing exits · thesis decay · time stops</div><div id="out"><span class="loader"></span></div></div></div>`;
+  try{
+    const d=await api("/api/positions");const rows=d.positions||[];
+    if(!rows.length){$("#out").innerHTML=`<div class="panel hold">No open positions. Run the pipeline — approved BUY/SELL signals auto-open tracked positions here.</div>`;return;}
+    const pref=["ticker","direction","entry","entry_price","last","last_price","pnl_pct","shares","qty","days_held","stop","trail_stop","binding_constraint","status","opened"];
+    const cols=[...new Set([...pref.filter(k=>rows.some(r=>r[k]!=null)),...Object.keys(rows[0])])];
+    const pretty=k=>k.replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase());
+    let html=`<div class="tbl"><table><tr>${cols.map(c=>`<th class="${/pnl|price|last|entry|shares|qty|days|stop/i.test(c)?"r":""}">${pretty(c)}</th>`).join("")}</tr>`;
+    rows.forEach(r=>{html+=`<tr class="clickable" data-ticker="${r.ticker||""}">`+cols.map(c=>{
+      let v=r[c];if(v==null)v="—";
+      if(/pnl/.test(c)&&typeof r[c]==="number")return `<td class="r">${fmtPct(r[c])}</td>`;
+      if(typeof r[c]==="number")return `<td class="r">${num(r[c]).toLocaleString()}</td>`;
+      if(/direction/i.test(c))return `<td class="c"><span class="sig ${String(v).toLowerCase()==="buy"||String(v).toLowerCase()==="long"?"buy":"sell"}">${v}</span></td>`;
+      return `<td>${v}</td>`;}).join("")+"</tr>";});
+    $("#out").innerHTML=html+"</table></div>";
+  }catch(e){$("#out").innerHTML=`<div class="panel sell">Error: ${e.message}</div>`;}
+}
+
+/* PATCH: Memory tab — adds graded-memory scorecard panel (feedback loop visibility) */
+async function renderMemory(){
+  $("#main").innerHTML=`<div class="wrap"><div class="card"><h1>🧠 Trading Memory</h1><div class="sub">decisions auto-grade WIN/LOSS after 30d · hit-rate feeds future prompts</div><div id="scard"><span class="loader"></span></div></div>
+  <div class="card"><h2>Decision History</h2><div id="out"><span class="loader"></span></div></div></div>`;
+  api("/api/scorecard").then(d=>{const sc=d.scorecard||{};const ent=Object.entries(sc).filter(([k,v])=>typeof v!=="object");
+  const el=$("#scard");if(el)el.innerHTML=ent.length?`<div class="kv">${ent.map(([k,v])=>`<b>${k.replace(/_/g," ")}</b><span>${typeof v==="number"&&(k.includes("pct")||k.includes("ret"))?fmtPct(v):v}</span>`).join("")}</div>`:`<div class="dim">Scorecard empty — grades appear after decisions age 30 days.</div>`;}).catch(()=>{const el=$("#scard");if(el)el.innerHTML="<span class='dim'>scorecard unavailable</span>";});
+  try{const d=await api("/api/memory");let html=`<table><tr><th>Date</th><th>Ticker</th><th class="c">Action</th><th class="c">Outcome</th><th class="r">Return</th></tr>`;
+    (d.decisions||[]).slice().reverse().forEach(m=>{html+=`<tr class="clickable" data-ticker="${m.ticker}"><td>${m.date}</td><td><b>${m.ticker}</b></td><td class="c"><span class="sig ${String(m.action).toLowerCase()}">${m.action}</span></td><td class="c">${m.outcome||"PENDING"}</td><td class="r">${m.realized_ret!=null?fmtPct(m.realized_ret):"—"}</td></tr>`;});
+    if(!(d.decisions||[]).length)html+=`<tr><td colspan="5" class="dim">no decisions yet</td></tr>`;
+    $("#out").innerHTML=html+"</table>";}catch(e){$("#out").innerHTML=`<div class="panel sell">Error: ${e.message}</div>`;}
+}
+
+/* PATCH: Diagnostics — only REAL endpoints (phantom /api/quality removed), audit details, backend switcher */
+async function renderDiag(){
+  $("#main").innerHTML=`<div class="wrap"><div class="card"><h1>🧪 Diagnostics</h1><div id="out"><span class="loader"></span></div></div></div>`;
+  try{
+    const [h,a]=await Promise.all([api("/api/system/health"),api("/api/audit").catch(()=>({events:[],chain_ok:null}))]);
+    // Reflect the LIVE provider in the header pill + footer (not hardcoded NOUS)
+    const pp=(h.primary_provider||"").toUpperCase();
+    const pill=document.getElementById("pillAI"); if(pill) pill.textContent=pp||"AI";
+    const foot=document.querySelector("footer"); if(foot) foot.textContent=`SKIA ALPHA FUND · SHADOW ALPHA TERMINAL · POWERED BY ${pp||"AI"}`;
+    const ev=a.events&&a.events[0];
+    const evTs=ev?(ev.ts||ev.timestamp||ev.at||""):"";
+    let evWhen="";try{evWhen=evTs?new Date(isNaN(+evTs)?evTs:+evTs*1000).toLocaleString():"";}catch(e){}
+    $("#out").innerHTML=`<div class="panel"><h3>Health</h3><div class="kv">
+    <b>Status</b><span>${h.status||"—"}</span>
+    <b>Provider</b><span>${h.primary_provider}${h.ai_key_present?" · key ✅":" · key ❌ (set NOUS_API_KEY/GROQ_API_KEY in .env)"}</span>
+    <b>Benchmark</b><span>${h.benchmark} (${h.benchmark_bars} bars)</span>
+    <b>Baskets / Universe</b><span>${h.baskets} / ${h.universe_tickers}</span>
+    <b>Audit chain</b><span>${a.chain_ok==null?"unknown":"✅ intact"} · ${a.events.length} recent events</span>
+    <b>Latest event</b><span>${ev?`${ev.kind||ev.event||ev.type||"—"}${evWhen?" @ "+evWhen:""}`:"—"}</span></div></div>
+    <div class="row" style="margin-top:8px"><b style="font-size:12px">API base:</b>
+    <input id="abase" placeholder="(same origin)" style="width:280px" value="${API_BASE}">
+    <button class="btn" onclick="setApiBase(document.getElementById('abase').value.trim())">Set</button>
+    <button class="btn ghost" onclick="setApiBase('')">Reset</button></div>
+    <div class="sub" style="margin-top:6px">Leave blank when served by FastAPI itself. Remote backend? Paste its https URL once — persisted.</div>`;
+  }catch(e){$("#out").innerHTML=`<div class="panel sell">Error: ${e.message}</div>`;}
+}
+render();
+// Boot: show LIVE provider in pill + footer (not hardcoded NOUS)
+(function(){api("/api/system/health").then(function(h){
+  const pp=(h&&h.primary_provider||"").toUpperCase();
+  const p=document.getElementById("pillAI"); if(p&&pp) p.textContent=pp;
+  const f=document.querySelector("footer"); if(f&&pp) f.textContent="SKIA ALPHA FUND · SHADOW ALPHA TERMINAL · POWERED BY "+pp;
+}).catch(function(){});})();
+</script>
+</body>
+</html>
